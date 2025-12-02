@@ -22,4 +22,3 @@
 (comment (find-total (u/slurp-input-with-sep input-file #",")))
 (comment (find-total (u/slurp-input-with-sep input-file #",") :method "exactly-twice"))
 (comment (find-total (u/slurp-input-with-sep input-file #",") :method "atleast-twice"))
-
