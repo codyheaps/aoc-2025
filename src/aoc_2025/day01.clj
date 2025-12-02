@@ -1,55 +1,49 @@
-(ns aoc-2025.day01)
+(ns aoc-2025.day01
+  (:require [aoc-2025.utils :as u]))
 
-; ToDo: Strip out util functions for file read, etc.
-(defonce input (slurp "./resources/inputs/day01.txt"))
+(defonce input-file "./resources/inputs/day01.txt")
 
-; First Challenge
-(defn- crack-first-password [input start dial-size]
-  (let [current-position (atom start)
-        password (atom 0)]
-    (doseq [item input]
-      (let [combination (rest (re-find #"([a-zA-Z])(\d+)" item))
-            direction (clojure.string/lower-case (first combination))
-            turns (Integer/parseInt (second combination))]
-        (if (= direction "r")
-          (swap! current-position (fn [current-val] (+ current-val (mod turns dial-size))))
-          (swap! current-position (fn [current-val] (- current-val (mod turns dial-size)))))
-        (cond
-          (>= @current-position dial-size) (swap! current-position (fn [current-val] (- current-val dial-size)))
-          (< @current-position 0) (swap! current-position (fn [current-val] (+ current-val dial-size))))
-        (when (= @current-position 0)
-          (swap! password inc))))
-    @password))
+(defn- parse-combination [s]
+  (let [combination-parts (rest (re-find #"([a-zA-Z])(\d+)" s))
+        operation (condp = (clojure.string/lower-case (first combination-parts))
+                    "r" +
+                    "l" -
+                    "Invalid")
+        turns (Integer/parseInt (second combination-parts))]
+    [operation turns]))
 
-; Second Challenge
-(defn- crack-second-password [input start dial-size]
-  (let [current-position (atom start)
-        password (atom 0)]
-    (doseq [item input]
-      (let [combination (rest (re-find #"([a-zA-Z])(\d+)" item))
-            direction (clojure.string/lower-case (first combination))
-            turns (Integer/parseInt (second combination))]
-        (when (>= turns dial-size)
-          (swap! password (fn [current-val] (+ current-val (int (/ turns dial-size))))))
-        (if (= direction "r")
-          (swap! current-position (fn [current-val] (+ current-val (mod turns dial-size))))
-          (swap! current-position (fn [current-val] (- (if (zero? current-val) dial-size current-val) (mod turns dial-size)))))
-        (cond
-          (= @current-position dial-size) (swap! current-position (fn [current-val] (- current-val dial-size)))
-          (> @current-position dial-size) (do (swap! current-position (fn [current-val] (- current-val dial-size))) (swap! password inc))
-          (< @current-position 0) (do (swap! current-position (fn [current-val] (+ current-val dial-size))) (swap! password inc)))
-        (when (= @current-position 0)
-          (swap! password inc))))
-    @password))
+(defn- get-current-position [current-position operation turns dial-size]
+  (let [raw-calc (operation current-position (mod turns dial-size))
+        [true-position times-passed-zero] (cond
+                                            (= raw-calc dial-size) [(- raw-calc dial-size) 0]
+                                            (> raw-calc dial-size) [(- raw-calc dial-size) 1]
+                                            (and (zero? current-position) (< raw-calc 0)) [(+ raw-calc dial-size) 0]
+                                            (< raw-calc 0) [(+ raw-calc dial-size) 1]
+                                            :default [raw-calc 0])]
+    [true-position times-passed-zero]))
 
-(comment
-  (crack-first-password (clojure.string/split input #"\n") 50 100))
+(defn- calc-full-rotations [turns dial-size]
+  (let [full-rotations (if (>= turns dial-size) (quot turns dial-size) 0)]
+    full-rotations))
 
-(comment
-  (crack-second-password (clojure.string/split input #"\n") 50 100))
+(defn- crack-password [input start dial-size]
+  (reduce (fn [acc line]
+            (let [[operation turns] (parse-combination line)
+                  last-position (acc :current-position)
+                  [current-position passed-zeroes] (get-current-position (acc :current-position) operation turns dial-size)
+                  exact-zeroes (if (zero? current-position) (inc (acc :exact-zeroes)) (acc :exact-zeroes))
+                  full-passed-zeroes (-> acc :full-passed-zeroes (+ passed-zeroes (calc-full-rotations turns dial-size)))
+                  total-zeroes (+ exact-zeroes full-passed-zeroes)]
+              (assoc acc :last-position last-position
+                         :current-position current-position
+                         :exact-zeroes exact-zeroes
+                         :full-passed-zeroes full-passed-zeroes
+                         :total-zeroes total-zeroes)))
+          {:last-position 0 :current-position start :exact-zeroes 0 :full-passed-zeroes 0}
+          input))
 
-(comment ; should be 2
-  (crack-second-password ["L23" "L34" "R57" "R43" "L2"] 57 100))
+(comment (crack-password ["L68" "L30" "R48" "L5" "R60" "L55" "L1" "L99" "R14" "L82"] 50 100))
+(comment (-> (u/slurp-input input-file) (crack-password 50 100)))
 
 ;57 - 23 = 34
 ;34 - 34 = 0
