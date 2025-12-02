@@ -14,11 +14,10 @@
                         "atleast-twice" #"(.+)\1+")]
     (->> range
          get-range
-         (filter (fn [id] (re-matches match-pattern (str id))))
-         (reduce +))))
+         (filter (fn [id] (re-matches match-pattern (str id)))))))
 
 (defn- find-total [input & {:keys [method] :or {method "exactly-twice"}}]
-  (reduce + (map #(collect-invalid-ids % method) input)))
+  (u/flatten-then-sum (map #(collect-invalid-ids % method) input)))
 
 (comment (find-total (u/slurp-input-with-sep input-file #",")))
 (comment (find-total (u/slurp-input-with-sep input-file #",") :method "exactly-twice"))

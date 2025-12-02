@@ -4,3 +4,8 @@
   (-> file-path
       slurp
       (clojure.string/split sep-pattern)))
+
+(defn flatten-then-sum [coll]
+  (->> coll
+       flatten
+       (reduce +)))
