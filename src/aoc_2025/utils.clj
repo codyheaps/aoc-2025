@@ -1,6 +1,6 @@
 (ns aoc-2025.utils)
 
-(defn slurp-input [file-path]
+(defn slurp-input-with-sep [file-path sep-pattern]
   (-> file-path
       slurp
-      (clojure.string/split #"\n")))
+      (clojure.string/split sep-pattern)))

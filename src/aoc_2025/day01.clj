@@ -43,7 +43,7 @@
           input))
 
 (comment (crack-password ["L68" "L30" "R48" "L5" "R60" "L55" "L1" "L99" "R14" "L82"] 50 100))
-(comment (-> (u/slurp-input input-file) (crack-password 50 100)))
+(comment (-> (u/slurp-input-with-sep input-file #"\n") (crack-password 50 100)))
 
 ;57 - 23 = 34
 ;34 - 34 = 0
