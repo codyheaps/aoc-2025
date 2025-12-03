@@ -3,6 +3,14 @@
 
 (defonce input-file "./resources/inputs/day03.txt")
 
+; Original solution to problem #1
+(defn find-joltage [bank-int]
+  (let [bank-digit-map (mapv #(Integer/parseInt (str %)) (str bank-int))
+        first-joltage (apply max (butlast bank-digit-map))
+        second-joltage-map (subvec bank-digit-map (inc (.indexOf bank-digit-map first-joltage)))
+        second-joltage (apply max second-joltage-map)]
+    (Integer/parseInt (str first-joltage second-joltage))))
+
 ; A.I. did most of this with some prompt engineering practice, let's not kid ourselves.
 (defn find-max-joltage [bank size]
   (let [bank-vector (mapv #(Integer/parseInt (str %)) (str bank))]
