@@ -74,9 +74,9 @@
       calculate-movable-paper))
 
 (comment
-  (-> input-file
+  (time (-> input-file
       (u/slurp-input-with-sep #"\n")
-      (calculate-movable-paper :recursively? true)))
+      (calculate-movable-paper :recursively? true))))
 
 (comment
   (-> sample
