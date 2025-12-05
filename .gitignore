@@ -24,7 +24,8 @@
 *.jar
 *.swp
 *~
+*.iml
 /checkouts
 /classes
 /target
-/resources
+resources
