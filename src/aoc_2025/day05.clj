@@ -55,4 +55,3 @@
              count-fresh-ingredients-options))
 
 ; edge case when ranges overlap
-; count of a range is (end minus start) + 1
