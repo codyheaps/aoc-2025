@@ -1,5 +1,6 @@
 (ns aoc-2025.day05
-  (:require [aoc-2025.utils :as u]))
+  (:require [aoc-2025.utils :as u]
+            [clojure.string :as str]))
 
 (defonce input-file "./resources/inputs/day05.txt")
 
@@ -55,3 +56,13 @@
              count-fresh-ingredients-options))
 
 ; edge case when ranges overlap
+
+;(->> (str/split-lines sample)
+;     (split-with (complement str/blank?)))
+(split-with (complement clojure.string/blank?) ["1" "2" "3" "4" "" "5" "6" "7" "8"])
+
+(time (get-vectors-separated-by-space sample))
+(time (split-with (complement str/blank?) sample))
+
+(take-while (complement str/blank?) sample)
+(reduce (fn [acc n] (update acc :count + n)) {:count 0} [1 2 3 4 5])
