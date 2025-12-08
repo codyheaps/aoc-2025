@@ -93,5 +93,6 @@
              str/split-lines
              main))
 
+; test
 (comment (time (-> [0] first inc vector)))
 (comment (time (update {:count 0} :count inc)))
